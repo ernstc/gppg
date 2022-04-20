@@ -161,8 +161,8 @@ namespace QUT.GPGen.Parser
                     Terminal.RemoveMaxDummyTerminalFromDictionary( grammar.terminals );
                 }
                 catch (Exception x) {
-                    Console.Error.WriteLine( "GPPG: Error. Failed to deserialize file {0}", grammar.DatFileName );
-                    Console.Error.WriteLine( x.Message );
+                    GPCG.LogError("Error. Failed to deserialize file {0}", grammar.DatFileName);
+                    GPCG.LogError(x.Message);
                 }
                 finally {
                     if (fStrm != null)

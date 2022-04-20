@@ -1,51 +1,68 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>net20;netcoreapp2.0</TargetFrameworks>
-    <AssemblyName>Gppg</AssemblyName>
-    <RootNamespace>QUT.Gppg</RootNamespace>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net20;netcoreapp2.2;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+		<AssemblyName>Gppg</AssemblyName>
+		<RootNamespace>QUT.Gppg</RootNamespace>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
 
-  <!-- Pack settings -->
-  <PropertyGroup>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
-    <NuspecFile>MSBuild/Gppg.nuspec</NuspecFile>
-    <IntermediatePackDir>$(MSBuildProjectDirectory)/bin/$(Configuration)/publish/</IntermediatePackDir>
-    <PublishDir>$(IntermediatePackDir)$(TargetFramework)/</PublishDir>
-    <NuspecProperties>publishDir=$([MSBuild]::NormalizeDirectory($(IntermediatePackDir)))</NuspecProperties>
-  </PropertyGroup>
-  
-  <!-- Executes /t:Publish for all target frameworks before packing -->
-  <Target Name="NugetCrossTarget" AfterTargets="Build" Condition="'$(TargetFrameworks)' != ''">
-    <ItemGroup>
-      <_TargetFramework Include="$(TargetFrameworks)" />
-    </ItemGroup>
-    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" Properties="TargetFramework=%(_TargetFramework.Identity)" />
-  </Target>
+	<!-- Pack settings -->
+	<PropertyGroup>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<NuspecFile>MSBuild/Gppg.nuspec</NuspecFile>
+		<IntermediatePackDir>$(MSBuildProjectDirectory)/bin/$(Configuration)/publish/</IntermediatePackDir>
+		<PublishDir>$(IntermediatePackDir)$(TargetFramework)/</PublishDir>
+		<NuspecProperties>publishDir=$([MSBuild]::NormalizeDirectory($(IntermediatePackDir)))</NuspecProperties>
+	</PropertyGroup>
 
-  <Target Name="NugetSingleTarget" AfterTargets="Build" Condition="'$(TargetFrameworks)' == ''">
-    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" />
-  </Target>
+	<!-- Executes /t:Publish for all target frameworks before packing -->
+	<Target Name="NugetCrossTarget" AfterTargets="Build" Condition="'$(TargetFrameworks)' != ''">
+		<ItemGroup>
+			<_TargetFramework Include="$(TargetFrameworks)" />
+		</ItemGroup>
+		<MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" Properties="TargetFramework=%(_TargetFramework.Identity)" />
+	</Target>
 
-  <ItemGroup>
-    <GplexFile Include="ParserGenerator\SpecFiles\ScanAction.lex">
-      <OutputFile>ScanAction.cs</OutputFile>
-    </GplexFile>
-    <GplexFile Include="ParserGenerator\SpecFiles\gppg.lex">
-      <OutputFile>Scanner.cs</OutputFile>
-    </GplexFile>
-    <GppgFile Include="ParserGenerator\SpecFiles\gppg.y">
-      <OutputFile>Parser.cs</OutputFile>
-      <Arguments>/gplex /nolines</Arguments>
-    </GppgFile>
-  </ItemGroup>
+	<Target Name="NugetSingleTarget" AfterTargets="Build" Condition="'$(TargetFrameworks)' == ''">
+		<MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" />
+	</Target>
 
-  <ItemGroup>
-    <PackageReference Include="Gplex.Tool" Version="0.0.1-preview1" PrivateAssets="All" />
-    <PackageReference Include="Gppg.Tool" Version="0.0.1-preview1" PrivateAssets="All" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="ParserGenerator\SpecFiles\ResourceHeader.txt" />
+		<EmbeddedResource Include="ShiftReduceParser\ShiftReduceParserCode.cs" Link="ParserGenerator\SpecFiles\ShiftReduceParserCode.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="LICENSE.md" />
+		<Content Include="README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</Content>
+		<Content Include="Resources\Icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<LexFile Include="ParserGenerator\SpecFiles\ScanAction.lex">
+			<OutputFile>ScanAction.cs</OutputFile>
+		</LexFile>
+		<LexFile Include="ParserGenerator\SpecFiles\gppg.lex">
+			<OutputFile>Scanner.cs</OutputFile>
+		</LexFile>
+		<YaccFile Include="ParserGenerator\SpecFiles\gppg.y">
+			<OutputFile>Parser.cs</OutputFile>
+			<Arguments>/gplex /nolines</Arguments>
+		</YaccFile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="YaccLexTools.Gplex" Version="1.2.2" PrivateAssets="All" />
+		<PackageReference Include="YaccLexTools.Gppg" Version="1.5.2" PrivateAssets="All" />
+	</ItemGroup>
 
 </Project>

@@ -41,14 +41,13 @@ namespace QUT.GPGen
                 {
                     FileStream fStrm = new FileStream(outFile, FileMode.Create);
                     sWrtr = new StreamWriter(fStrm);
-                    Console.WriteLine("GPPG: sending output to {0}", outFile);
+                    GPCG.LogMessage("sending output to {0}", outFile);
                     Console.SetOut(sWrtr);
                 }
                 catch (IOException x)
                 {
-                    Console.Error.WriteLine("GPPG: Error. File redirect failed");
-                    Console.Error.WriteLine(x.Message);
-                    Console.Error.WriteLine("GPPG: Terminating ...");
+                    GPCG.LogError("Error. File redirect failed", x);
+                    GPCG.LogError("Terminating ...");
                     Environment.Exit(1);
                 }
             }
@@ -61,8 +60,7 @@ namespace QUT.GPGen
                     tWrtr.WriteLine( "// Symbolic tokens for grammar file \"{0}\"", grammar.InputFileIdent );
                 }
                 catch (IOException x) {
-                    Console.Error.WriteLine( "GPPG: Error. Failed to create token namelist file" );
-                    Console.Error.WriteLine( x.Message );
+                    GPCG.LogError("Error. Failed to create token namelist file", x);
                     tWrtr = null;
                 }
             }
@@ -75,8 +73,7 @@ namespace QUT.GPGen
                     cstWrtr.WriteLine( "// Token declarations  for grammar file \"{0}\"", grammar.InputFileIdent );
                 }
                 catch (IOException x) {
-                    Console.Error.WriteLine( "GPPG: Error. Failed to create C# token declaration file" );
-                    Console.Error.WriteLine( x.Message );
+                    GPCG.LogError("Error. Failed to create C# token declaration file", x);
                     cstWrtr = null;
                 }
             }
@@ -93,8 +90,7 @@ namespace QUT.GPGen
                     formatter.Serialize( fStrm, grammar.terminals );
                 }
                 catch (IOException x) {
-                    Console.Error.WriteLine( "GPPG: Error. Failed to create token serialization file" );
-                    Console.Error.WriteLine( x.Message );
+                    GPCG.LogError("Error. Failed to create token serialization file", x);
                 }
                 finally {
                     if (fStrm != null)
@@ -114,8 +110,7 @@ namespace QUT.GPGen
                 }
                 catch (IOException x)
                 {
-                    Console.Error.WriteLine("GPPG: Error. Failed to create conflict information file");
-                    Console.Error.WriteLine(x.Message);
+                    GPCG.LogError("Error. Failed to create conflict information file", x);
                     cWrtr = null;
                 }
             }

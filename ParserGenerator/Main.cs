@@ -10,6 +10,7 @@ using System.Globalization;
 using System.IO;
 using QUT.GPGen.Parser;
 using QUT.GPGen.Lexers;
+using QUT.Gppg.IncludeResources;
 
 [assembly: CLSCompliant( true )]
 namespace QUT.GPGen {
@@ -91,7 +92,7 @@ namespace QUT.GPGen {
 
                     if (Terminal.Max > 255)
                         // No ambiguating context possible since result appears in delimited error message
-                        handler.ListError( null, 103, CharacterUtilities.MapCodepointToDisplayForm( Terminal.Max ), '\'' ); 
+                        handler.ListError( null, 103, CharacterUtilities.MapCodepointToDisplayForm( Terminal.Max ), '\'' );
 
                     LALRGenerator generator = new LALRGenerator( grammar );
                     List<AutomatonState> states = generator.BuildStates();
@@ -106,6 +107,21 @@ namespace QUT.GPGen {
                     if (!handler.Errors) {
                         CodeGenerator emitter = new CodeGenerator( grammar );
                         emitter.Generate( states );
+
+                        // Generate the file ShiftReduceParserCode.cs if it does not exists in the current directory
+                        var files = Directory.GetFiles(Directory.GetCurrentDirectory(), Content.ShiftReduceParserCode_FileName, SearchOption.AllDirectories);
+                        if (files.Length == 0)
+                        {
+                            GPCG.LogMessage("creating file {0}", Content.ShiftReduceParserCode_FileName);
+                            using (FileStream fStrm = new FileStream(Content.ShiftReduceParserCode_FileName, FileMode.Create))
+                            {
+                                using (StreamWriter sWrtr = new StreamWriter(fStrm))
+                                {
+                                    sWrtr.WriteLine(Content.ResourceHeader);
+                                    sWrtr.WriteLine(Content.ShiftReduceParserCode);
+                                }
+                            }
+                        }
                     }
 
                     bool DoDiagnose = Diagnose && !grammar.HasNonTerminatingNonTerms;
@@ -161,11 +177,11 @@ namespace QUT.GPGen {
         private static StreamWriter ListingFile( string outName ) {
             try {
                 FileStream listFile = new FileStream( outName, FileMode.Create );
-                if (Verbose) Console.Error.WriteLine( "GPPG: opened listing file <{0}>", outName );
+                if (Verbose) GPCG.LogError("opened listing file <{0}>", outName);
                 return new StreamWriter( listFile );
             }
             catch (IOException) {
-                Console.Error.WriteLine( "GPPG: listing file <{0}> not opened", outName );
+                GPCG.LogError("listing file <{0}> not opened", outName);
                 return null;
             }
         }
@@ -301,14 +317,54 @@ namespace QUT.GPGen {
 
 
         private static void DisplayVersion() {
-            Assembly assm = Assembly.GetExecutingAssembly();
-            object info = Attribute.GetCustomAttribute( assm, typeof( AssemblyFileVersionAttribute ) );
-            versionInfo = ((AssemblyFileVersionAttribute)info).Version;
-
-            Console.WriteLine( "Gardens Point Parser Generator (gppg) " + versionInfo );
+            Console.WriteLine( "Gardens Point Parser Generator (gppg) " + VersionWithPlatform);
             Console.WriteLine( "Copyright (c) 2005-2014 Wayne Kelly, John Gough, QUT" );
             Console.WriteLine( "Queensland University of Technology" );
             Console.WriteLine();
+        }
+
+
+        private static string _versionWithPlatform;
+
+        internal static string VersionWithPlatform
+        {
+            get
+            {
+                if (_versionWithPlatform == null)
+                {
+#if NET20_OR_GREATER
+                    _versionWithPlatform = versionInfo + " [.Net Framework]";
+#elif NETCOREAPP2_2
+                    _versionWithPlatform = versionInfo + " [.Net Core 2.2]";
+#elif NETCOREAPP3_1
+                    _versionWithPlatform = versionInfo + " [.Net Core 3.1]";
+#elif NET5_0
+                    _versionWithPlatform = versionInfo + " [.Net 5]";
+#elif NET6_0
+                    _versionWithPlatform = versionInfo + " [.Net 6]";
+#endif
+                }
+                return _versionWithPlatform;
+            }
+        }
+
+
+        internal static void LogMessage(string format, params object[] args)
+        {
+            Console.WriteLine("GPPG {0}: {1}", VersionWithPlatform, String.Format(format, args));
+        }
+
+
+        internal static void LogError(string message, Exception exception)
+        {
+            Console.Error.WriteLine("GPPG {0}: {1}", VersionWithPlatform, message);
+            Console.Error.WriteLine(exception.Message);
+        }
+
+
+        internal static void LogError(string format, params object[] args)
+        {
+            Console.Error.WriteLine("GPPG {0}: {1}", VersionWithPlatform, String.Format(format, args));
         }
     }
 }
