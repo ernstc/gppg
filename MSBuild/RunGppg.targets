@@ -1,28 +1,28 @@
 <Project>
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net20' Or $(TargetFrameworks.Contains('net20'))">
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net20' Or $(TargetFrameworks.Contains('net20')) Or '$(TargetFrameworkVersion)' != ''">
 		<_GppgTool>"$(MSBuildThisFileDirectory)net20/Gppg.exe"</_GppgTool>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2' Or $(TargetFrameworks.Contains('netcoreapp2.2'))">
 		<_GppgTool>dotnet "$(MSBuildThisFileDirectory)netcoreapp2.2/Gppg.dll"</_GppgTool>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or $(TargetFrameworks.Contains('netcoreapp3.1'))">
-		<_GppgTool>"$(MSBuildThisFileDirectory)netcoreapp3.1/Gppg.exe"</_GppgTool>
+		<_GppgTool>dotnet "$(MSBuildThisFileDirectory)netcoreapp3.1/Gppg.dll"</_GppgTool>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net5.0' Or $(TargetFrameworks.Contains('net5.0'))">
-		<_GppgTool>"$(MSBuildThisFileDirectory)net5.0/Gppg.exe"</_GppgTool>
+		<_GppgTool>dotnet "$(MSBuildThisFileDirectory)net5.0/Gppg.dll"</_GppgTool>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net6.0' Or $(TargetFrameworks.Contains('net6.0'))">
-		<_GppgTool>"$(MSBuildThisFileDirectory)net6.0/Gppg.exe"</_GppgTool>
+		<_GppgTool>dotnet "$(MSBuildThisFileDirectory)net6.0/Gppg.dll"</_GppgTool>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(_GppgTool)' == ''">
-		<_GppgTool>"$(MSBuildThisFileDirectory)net6.0/Gppg.exe"</_GppgTool>
+		<_GppgTool>dotnet "$(MSBuildThisFileDirectory)net6.0/Gppg.dll"</_GppgTool>
 	</PropertyGroup>
 
 	<!-- Defaults for YaccFile items -->
 	<ItemDefinitionGroup>
 		<YaccFile>
 			<OutputFile>%(Identity).cs</OutputFile>
-			<Arguments></Arguments>
+			<Arguments>/gplex /nolines</Arguments>
 		</YaccFile>
 	</ItemDefinitionGroup>
 
