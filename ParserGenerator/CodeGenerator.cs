@@ -187,9 +187,7 @@ namespace QUT.GPGen
             Console.WriteLine();
             if (GPCG.IncludeInfo) {
                 Console.WriteLine( "// GPPG version " + GPCG.versionInfo );
-                Console.WriteLine( "// Machine:  " + Environment.MachineName );
                 Console.WriteLine( "// DateTime: " + DateTime.Now.ToString() );
-                Console.WriteLine( "// UserName: " + Environment.UserName );
                 Console.WriteLine( "// Input file <{0}>", grammar.InputFileIdent );
             }
 

@@ -200,13 +200,10 @@ namespace QUT.GPGen.Parser
             buff.Pos = 0;
             sWrtr.WriteLine(); 
             ListDivider(sWrtr);
-            sWrtr.WriteLine("//  GPPG error listing for yacc source file <"
-                                                           + name + ">");
+            sWrtr.WriteLine("//  GPPG error listing for yacc source file <" + name + ">");
             ListDivider(sWrtr);
             sWrtr.WriteLine("//  Version:  " + version);
-            sWrtr.WriteLine("//  Machine:  " + Environment.MachineName);
             sWrtr.WriteLine("//  DateTime: " + DateTime.Now.ToString());
-            sWrtr.WriteLine("//  UserName: " + Environment.UserName);
             ListDivider(sWrtr); sWrtr.WriteLine(); sWrtr.WriteLine();
             //
             //  Initialize the error group
