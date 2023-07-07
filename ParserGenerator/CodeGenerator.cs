@@ -86,8 +86,14 @@ namespace QUT.GPGen
                     Terminal.InsertMaxDummyTerminalInDictionary( grammar.terminals );
                    
                     fStrm = new FileStream( grammar.DatFileName, FileMode.Create );
+#if NETCOREAPP3_1_OR_GREATER || NET5_0_OR_GREATER
+                    var json = System.Text.Json.JsonSerializer.Serialize(grammar.terminals);
+                    BinaryWriter writer = new BinaryWriter( fStrm );
+                    writer.Write( json );
+#else
                     BinaryFormatter formatter = new BinaryFormatter();
                     formatter.Serialize( fStrm, grammar.terminals );
+#endif
                 }
                 catch (IOException x) {
                     GPCG.LogError("Error. Failed to create token serialization file", x);
