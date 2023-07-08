@@ -1,7 +1,7 @@
 # New BSD License (BSD)
 Copyright (c) 2009, QUT, Wayne Kelly
 
-Copyright (c) 2022, Ernesto Cianciotta
+Copyright (c) 2023, Ernesto Cianciotta
 
 All rights reserved.
 

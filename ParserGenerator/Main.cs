@@ -342,6 +342,8 @@ namespace QUT.GPGen {
                     _versionWithPlatform = versionInfo + " [.Net 5]";
 #elif NET6_0
                     _versionWithPlatform = versionInfo + " [.Net 6]";
+#elif NET7_0
+                    _versionWithPlatform = versionInfo + " [.Net 7]";
 #endif
                 }
                 return _versionWithPlatform;
