@@ -7,6 +7,7 @@ using System.Text;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace QUT.Gppg {
@@ -201,7 +202,7 @@ namespace QUT.Gppg {
         /// <returns>True if parse succeeds, else false for
         /// unrecoverable errors</returns>
         public bool Parse() {
-            Initialize();	// allow derived classes to instantiate rules, states and nonTerminals
+            Initialize();    // allow derived classes to instantiate rules, states and nonTerminals
 
             NextToken = 0;
             FsaState = states[0];
@@ -212,7 +213,7 @@ namespace QUT.Gppg {
 
             while (true) {
 #if TRACE_ACTIONS
-                Console.Error.WriteLine("Entering state {0} ", FsaState.number);
+                DebugPrintLine("Entering state {0} ", FsaState.number);
                 DisplayStack();
 #endif
                 int action = FsaState.defaultAction;
@@ -225,12 +226,12 @@ namespace QUT.Gppg {
                         LastSpan = scanner.yylloc;
                         NextToken = scanner.yylex();
 #if TRACE_ACTIONS
-                       Console.Error.WriteLine( "Reading: Next token is {0}", TerminalToString( NextToken ) );
+                        DebugPrintLine("Reading: Next token is {0}", TerminalToString( NextToken ) );
 #endif
                     }
 #if TRACE_ACTIONS
                     else 
-                        Console.Error.WriteLine( "Next token is still {0}", TerminalToString( NextToken ) );
+                        DebugPrintLine("Next token is still {0}", TerminalToString( NextToken ) );
 #endif
                     if (FsaState.ParserTable.ContainsKey( NextToken ))
                         action = FsaState.ParserTable[NextToken];
@@ -244,7 +245,7 @@ namespace QUT.Gppg {
                 {
                     try {
                         Reduce( -action );
-                        if (action == -1)	// accept
+                        if (action == -1)    // accept
                             return true;
                     }
                     catch (AbortException) {
@@ -267,7 +268,7 @@ namespace QUT.Gppg {
 
         private void Shift( int stateIndex ) {
 #if TRACE_ACTIONS
-				Console.Error.Write("Shifting token {0}, ", TerminalToString(NextToken));
+            DebugPrint("Shifting token {0}, ", TerminalToString(NextToken));
 #endif
             FsaState = states[stateIndex];
 
@@ -289,7 +290,7 @@ namespace QUT.Gppg {
 
         private void Reduce( int ruleNumber ) {
 #if TRACE_ACTIONS
-				DisplayRule(ruleNumber);
+            DisplayRule(ruleNumber);
 #endif
             Rule rule = rules[ruleNumber];
             int rhLen = rule.RightHandSide.Length;
@@ -392,7 +393,7 @@ namespace QUT.Gppg {
             Shift( FsaState.ParserTable[NextToken] );
 
 #if TRACE_ACTIONS
-				Console.Error.WriteLine("Entering state {0} ", FsaState.number);
+            DebugPrintLine("Entering state {0} ", FsaState.number);
 #endif
             NextToken = old_next;
         }
@@ -406,18 +407,18 @@ namespace QUT.Gppg {
                     return true;
 
 #if TRACE_ACTIONS
-					Console.Error.WriteLine("Error: popping state {0}", StateStack.TopElement().number);
+                DebugPrintLine("Error: popping state {0}", StateStack.TopElement().number);
 #endif
                 StateStack.Pop();
                 valueStack.Pop();
                 LocationStack.Pop();
 
 #if TRACE_ACTIONS
-			    DisplayStack();
+                DisplayStack();
 #endif
                 if (StateStack.IsEmpty()) {
 #if TRACE_ACTIONS
-                        Console.Error.WriteLine("Aborting: didn't find a state that accepts error token");
+                    DebugPrintLine("Aborting: didn't find a state that accepts error token");
 #endif
                     return false;
                 }
@@ -435,12 +436,12 @@ namespace QUT.Gppg {
                 while (true) {
                     if (NextToken == 0) {
 #if TRACE_ACTIONS
-                            Console.Error.Write("Reading a token: ");
+                        DebugPrint("Reading a token: ");
 #endif
                         NextToken = scanner.yylex();
                     }
 #if TRACE_ACTIONS
-                        Console.Error.WriteLine("Next token is {0}", TerminalToString(NextToken));
+                    DebugPrintLine("Next token is {0}", TerminalToString(NextToken));
 #endif
                     if (NextToken == endOfFileToken)
                         return false;
@@ -452,7 +453,7 @@ namespace QUT.Gppg {
                         return true;
                     else {
 #if TRACE_ACTIONS
-                            Console.Error.WriteLine("Error: Discarding {0}", TerminalToString(NextToken));
+                        DebugPrintLine("Error: Discarding {0}", TerminalToString(NextToken));
 #endif
                         NextToken = 0;
                     }
@@ -474,7 +475,7 @@ namespace QUT.Gppg {
                 //  use the LALR(1) table if a production ends on "error"
                 //
 #if TRACE_ACTIONS
-                    Console.Error.WriteLine("Error: panic discard of {0}", TerminalToString(NextToken));
+                DebugPrintLine("Error: panic discard of {0}", TerminalToString(NextToken));
 #endif
                 if (NextToken == endOfFileToken)
                     return false;
@@ -516,25 +517,25 @@ namespace QUT.Gppg {
         }
 
         private void DisplayStack() {
-            Console.Error.Write( "State stack is now:" );
+            DebugPrint( "State stack is now:" );
             for (int i = 0; i < StateStack.Depth; i++)
-                Console.Error.Write( " {0}", StateStack[i].number );
-            Console.Error.WriteLine();
+                DebugPrint( " {0}", StateStack[i].number );
+            DebugPrintLine("");
         }
 
         private void DisplayRule( int ruleNumber ) {
-            Console.Error.Write( "Reducing stack by rule {0}, ", ruleNumber );
+            DebugPrint("Reducing stack by rule {0}, ", ruleNumber);
             DisplayProduction( rules[ruleNumber] );
         }
 
         private void DisplayProduction( Rule rule ) {
             if (rule.RightHandSide.Length == 0)
-                Console.Error.Write( "/* empty */ " );
+                DebugPrint( "/* empty */ " );
             else
                 foreach (int symbol in rule.RightHandSide)
-                    Console.Error.Write( "{0} ", SymbolToString( symbol ) );
+                    DebugPrint( "{0} ", SymbolToString( symbol ) );
 
-            Console.Error.WriteLine( "-> {0}", SymbolToString( rule.LeftHandSide ) );
+            DebugPrintLine( "-> {0}", SymbolToString( rule.LeftHandSide ) );
         }
 
         /// <summary>
@@ -552,6 +553,40 @@ namespace QUT.Gppg {
             else
                 return TerminalToString( symbol );
         }
+
+#if TRACE_ACTIONS_CONSOLE
+        private void DebugPrint(String text) {
+            Console.Error.Write(text);
+        }
+
+        private void DebugPrintLine(String text) {
+            Console.Error.WriteLine(text);
+        }
+
+        private void DebugPrint(String format, params Object[] args) {
+            Console.Error.Write(format, args);
+        }
+
+        private void DebugPrintLine(String format, params Object[] args) {
+            Console.Error.WriteLine(format, args);
+        }
+#else
+        private void DebugPrint(String text) {
+            Debug.Write(text);
+        }
+
+        private void DebugPrintLine(String text) {
+            Debug.WriteLine(text);
+        }
+
+        private void DebugPrint(String format, params Object[] args) {
+            Debug.Write(String.Format(format, args));
+        }
+
+        private void DebugPrintLine(String format, params Object[] args) {
+            Debug.WriteLine(String.Format(format, args));
+        }
+#endif
 
         /// <summary>
         /// Return text representation of argument character
@@ -747,7 +782,7 @@ namespace QUT.Gppg {
 #endif
         internal Dictionary<int, int> ParserTable;   // Terminal -> ParseAction
         internal Dictionary<int, int> Goto;          // NonTerminal -> State;
-        internal int defaultAction; // = 0;		     // ParseAction
+        internal int defaultAction; // = 0;          // ParseAction
 
         /// <summary>
         /// State transition data for this state. Pairs of elements of the 
