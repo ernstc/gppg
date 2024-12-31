@@ -341,8 +341,6 @@ namespace QUT.GPGen.Parser
         public GppgInternalException(string message) : base(message) { }
         public GppgInternalException(string message, Exception innerException)
             : base(message, innerException) { }
-        protected GppgInternalException(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
     }
 
     [Serializable]
@@ -351,8 +349,6 @@ namespace QUT.GPGen.Parser
         public TooManyErrorsException(string message) : base(message) { }
         public TooManyErrorsException(string message, Exception innerException)
             : base(message, innerException) { }
-        protected TooManyErrorsException(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
     }
 
     // ===================================================================
