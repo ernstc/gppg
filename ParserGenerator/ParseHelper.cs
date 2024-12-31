@@ -156,7 +156,7 @@ namespace QUT.GPGen.Parser
                 FileStream fStrm = null;
                 try {
                     fStrm = new FileStream( grammar.DatFileName, FileMode.Open );
-#if NETCOREAPP3_1_OR_GREATER || NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
                     BinaryReader reader = new BinaryReader( fStrm );
                     string json = reader.ReadString();
                     grammar.terminals = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Terminal>>( json );
