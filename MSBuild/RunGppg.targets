@@ -11,6 +11,9 @@
 	<PropertyGroup Condition="$(TargetFramework.Contains('net9.0')) Or $(TargetFrameworks.Contains('net9.0'))">
 		<_GppgTool>dotnet "$(MSBuildThisFileDirectory)net9.0/Gppg.dll"</_GppgTool>
 	</PropertyGroup>
+	<PropertyGroup Condition="$(TargetFramework.Contains('net10.0')) Or $(TargetFrameworks.Contains('net10.0'))">
+		<_GppgTool>dotnet "$(MSBuildThisFileDirectory)net10.0/Gppg.dll"</_GppgTool>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(_GppgTool)' == ''">
 		<_GppgTool>dotnet "$(MSBuildThisFileDirectory)net8.0/Gppg.dll"</_GppgTool>
 	</PropertyGroup>
